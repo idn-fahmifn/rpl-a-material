@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Profile;
 use Illuminate\Http\Request;
 use Validator;
+use Storage;
 
 class ProfileController extends Controller
 {
@@ -15,7 +16,8 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        return view ('profile.index');
+        $profile = Profile::all();
+        return view ('profile.index', compact('profile'));
     }
 
     /**
@@ -38,18 +40,32 @@ class ProfileController extends Controller
     {
         $input = $request->all();
 
-        // validasi data
-        $validator = Validator::make($input, [
-            'nama' => 'required|min:2|max:50',
-            'photo' => 'requred|image|mimes:jpg,jpeg,png|max:2048'
+        // requirement column nama dan photo
+        $validator = Validator::make($input,[
+            'nama' => 'required|max:255',
+            'photo' => 'required|image|mimes:jpeg,jpg,png|max:2048'
         ]);
 
+
+        // validasi untuk data yang apabila gagal, maka akan keluar error data tidak valid
         if($validator->fails())
+        {  
+            // return redirect()->route('kategori.create')->withErrors($validator)->withInput();
+            return 'Data Tidak Valid';
+        }
+
+        // kondisi input foto (file)
+        if($request->hasFile('photo'))
         {
-            return back();
+            $destination_path = 'public/images/profile'; //path tempat penyimpanan (storage/public/images/profile)
+            $image = $request -> file('photo'); //mengambil request column photo
+            $image_name = $image->getClientOriginalName(); //memberikan nama gambar yang akan disimpan di foto
+            $path = $request->file('photo')->storeAs($destination_path, $image_name); //mengirimkan foto ke folder store
+            $input['photo'] = $image_name; //mengirimkan ke database
         }
         Profile::create($input);
-        return redirect('/profile');
+        return redirect()->route('Profile');
+        // dd($input);
     }
 
     /**
