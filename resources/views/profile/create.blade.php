@@ -12,7 +12,7 @@ Halaman Profile
                 </div>
 
                 <div class="card-body">
-                    <form action="{{route('profile.store')}}" method="post">
+                    <form action="{{route('profile.store')}}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label>Foto Profile</label>

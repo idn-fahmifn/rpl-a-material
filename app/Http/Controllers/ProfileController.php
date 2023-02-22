@@ -64,7 +64,7 @@ class ProfileController extends Controller
             $input['photo'] = $image_name; //mengirimkan ke database
         }
         Profile::create($input);
-        return redirect()->route('Profile');
+        return redirect('/profile');
         // dd($input);
     }
 
